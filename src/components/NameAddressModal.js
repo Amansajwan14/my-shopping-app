@@ -1,124 +1,59 @@
 "use client";
 
 import { useState } from "react";
+import { useCart } from "../context/CartContext";
+import toast from "react-hot-toast";
 
-export default function NameAddressModal({ isOpen, onClose, onSubmit }) {
-  const [step, setStep] = useState(1);
+export default function NameAddressModal({ product, onClose }) {
+  const { placeOrder } = useCart();
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("");
 
-  if (!isOpen) return null;
+  const handlePlaceOrder = () => {
+    if (!name.trim() || !address.trim()) {
+      toast.error("Please enter both name and address.");
+      return;
+    }
 
-  const handleNext = () => {
-    if (!name || !address) return;
-    setStep(2);
-  };
+    // Place order with only this product
+    placeOrder([ { ...product, quantity: 1 } ]);
+    toast.success("Order placed successfully!");
 
-  const handleSubmit = () => {
-    if (!paymentMethod) return;
-    onSubmit({ name, address, paymentMethod });
-    setStep(1);
+    // Reset and close modal
     setName("");
     setAddress("");
-    setPaymentMethod("");
+    onClose();
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded shadow-lg w-96">
-        {step === 1 && (
-          <>
-            <h2 className="text-xl font-semibold mb-4">Enter your details</h2>
-            <div className="flex flex-col gap-3">
-              <input
-                type="text"
-                placeholder="Full Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="border px-3 py-2 rounded w-full"
-                required
-              />
-              <textarea
-                placeholder="Address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                className="border px-3 py-2 rounded w-full"
-                required
-              />
-            </div>
-            <div className="flex justify-end gap-2 mt-2">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleNext}
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-              >
-                Next
-              </button>
-            </div>
-          </>
-        )}
-
-        {step === 2 && (
-          <>
-            <h2 className="text-xl font-semibold mb-4">Select Payment Method</h2>
-            <div className="flex flex-col gap-3">
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="payment"
-                  value="Credit Card"
-                  checked={paymentMethod === "Credit Card"}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
-                Credit Card
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="payment"
-                  value="UPI"
-                  checked={paymentMethod === "UPI"}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
-                UPI
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="payment"
-                  value="Cash on Delivery"
-                  checked={paymentMethod === "Cash on Delivery"}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
-                Cash on Delivery
-              </label>
-            </div>
-            <div className="flex justify-end gap-2 mt-2">
-              <button
-                type="button"
-                onClick={() => setStep(1)}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-              >
-                Back
-              </button>
-              <button
-                type="button"
-                onClick={handleSubmit}
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-              >
-                Place Order
-              </button>
-            </div>
-          </>
-        )}
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-md w-96 shadow-lg relative">
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 font-bold text-lg"
+        >
+          &times;
+        </button>
+        <h2 className="text-xl font-semibold mb-4">Enter Your Details</h2>
+        <input
+          type="text"
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="w-full mb-3 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
+        />
+        <textarea
+          placeholder="Address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          className="w-full mb-3 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
+        />
+        <button
+          onClick={handlePlaceOrder}
+          className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
+        >
+          Place Order
+        </button>
       </div>
     </div>
   );
