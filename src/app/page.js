@@ -14,10 +14,15 @@ export default function HomePage() {
 
   useEffect(() => {
     async function fetchProducts() {
-      const res = await fetch("https://fakestoreapi.com/products");
-      const data = await res.json();
-      setProducts(data);
-      setRandomProducts(data.sort(() => 0.5 - Math.random()).slice(0, 5));
+      try {
+        const res = await fetch("https://fakestoreapi.com/products", { cache: "no-store" });
+        if (!res.ok) throw new Error("Failed to fetch products");
+        const data = await res.json();
+        setProducts(data);
+        setRandomProducts(data.sort(() => 0.5 - Math.random()).slice(0, 5));
+      } catch (err) {
+        console.error("Error fetching products:", err);
+      }
     }
     fetchProducts();
   }, []);
@@ -48,7 +53,11 @@ export default function HomePage() {
 
       <div className="max-w-7xl mx-auto px-4 py-10 bg-purple-50 rounded-md shadow">
         <h2 className="text-2xl font-bold text-purple-800 mb-6">Featured Products</h2>
-        <FeaturedCarousel products={randomProducts} />
+        {randomProducts.length === 0 ? (
+          <p className="text-gray-500">No featured products available.</p>
+        ) : (
+          <FeaturedCarousel products={randomProducts} />
+        )}
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-10 bg-white rounded-md shadow-md mt-8">
@@ -57,9 +66,7 @@ export default function HomePage() {
           {filteredProducts.length === 0 ? (
             <p className="text-gray-500">No products found.</p>
           ) : (
-            filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))
+            filteredProducts.map((product) => <ProductCard key={product.id} product={product} />)
           )}
         </div>
       </div>
