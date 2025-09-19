@@ -6,15 +6,12 @@ export default function MyOrdersPage() {
   const { orders } = useCart();
 
   if (orders.length === 0) {
-    return <p className="p-6 text-gray-500">You haven't placed any orders yet.</p>;
+    return <p className="p-6 text-gray-500">You haven&apos;t placed any orders yet.</p>;
   }
-
-  // Sort orders latest first
-  const sortedOrders = [...orders].sort((a, b) => b.id - a.id);
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      {sortedOrders.map((order) => (
+      {orders.map((order) => (
         <div
           key={order.id}
           className="mb-6 p-4 border border-gray-300 rounded shadow-sm"

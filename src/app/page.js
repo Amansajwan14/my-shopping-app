@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
-import Fuse from "fuse.js";
+import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import SearchBar from "../components/SearchBar";
 import CategoryIconBar from "../components/CategoryIconBar";
@@ -25,27 +24,11 @@ export default function HomePage() {
 
   const categories = ["All", ...new Set(products.map((p) => p.category))];
 
-  // Fuse instance memoized
-  const fuse = useMemo(() => {
-    return new Fuse(products, {
-      keys: ["title", "description", "category"],
-      threshold: 0.3,
-    });
-  }, [products]);
-
-  const filteredProducts = useMemo(() => {
-    if (!searchTerm) {
-      return products.filter(
-        (p) => selectedCategory === "All" || p.category === selectedCategory
-      );
-    }
-
-    const fuseResults = fuse.search(searchTerm).map((result) => result.item);
-
-    return fuseResults.filter(
-      (p) => selectedCategory === "All" || p.category === selectedCategory
-    );
-  }, [products, fuse, searchTerm, selectedCategory]);
+  const filteredProducts = products.filter(
+    (product) =>
+      product.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (selectedCategory === "All" || product.category === selectedCategory)
+  );
 
   const clearCategory = () => setSelectedCategory("All");
 
@@ -53,11 +36,7 @@ export default function HomePage() {
     <>
       <div className="sticky top-[64px] z-40 bg-purple-600 text-white shadow-md w-full">
         <div className="max-w-7xl mx-auto p-4 space-y-2">
-          <SearchBar
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            placeholder="Search products..."
-          />
+          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} placeholder="Search products..." />
           <CategoryIconBar
             categories={categories}
             selectedCategory={selectedCategory}

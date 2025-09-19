@@ -8,22 +8,10 @@ export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
   const [orders, setOrders] = useState([]);
 
-  // Load orders from localStorage
   useEffect(() => {
     const savedOrders = localStorage.getItem("orders");
     if (savedOrders) setOrders(JSON.parse(savedOrders));
   }, []);
-
-  // Load cart items from localStorage
-  useEffect(() => {
-    const savedCart = localStorage.getItem("cartItems");
-    if (savedCart) setCartItems(JSON.parse(savedCart));
-  }, []);
-
-  // Persist cart items
-  useEffect(() => {
-    localStorage.setItem("cartItems", JSON.stringify(cartItems));
-  }, [cartItems]);
 
   function addToCart(product) {
     setCartItems((prev) => {
@@ -44,27 +32,26 @@ export function CartProvider({ children }) {
     setCartItems((prev) => prev.filter((item) => item.id !== productId));
   }
 
-  function placeOrder(customer) {
-    if (cartItems.length === 0) return;
+  function clearCart() {
+    setCartItems([]);
+  }
 
+  function placeOrder(customerDetails) {
     const newOrder = {
       id: Date.now(),
       date: new Date().toLocaleString(),
       items: cartItems,
-      customer, // Includes name, address, paymentMethod
+      customer: customerDetails || {},
     };
 
-    // Add new order at the beginning (latest-first)
     const updatedOrders = [newOrder, ...orders];
     setOrders(updatedOrders);
     localStorage.setItem("orders", JSON.stringify(updatedOrders));
-
-    // Cart remains intact
   }
 
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, orders, placeOrder }}
+      value={{ cartItems, addToCart, removeFromCart, clearCart, placeOrder, orders }}
     >
       {children}
     </CartContext.Provider>
