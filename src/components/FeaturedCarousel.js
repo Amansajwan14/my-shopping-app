@@ -2,13 +2,12 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
-export default function SimpleImageCarousel({ products = [], height = "400px" }) {
+export default function FeaturedCarousel({ products = [], height = "400px" }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const timeoutRef = useRef(null);
-  const [loadedImages, setLoadedImages] = useState({}); // track loaded images
 
-  // Reset and start timer for auto slide
   const resetTimeout = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
   };
@@ -44,21 +43,14 @@ export default function SimpleImageCarousel({ products = [], height = "400px" })
             index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
           }`}
         >
-          <div className="relative w-auto h-full">
-            {/* Shimmer placeholder */}
-            {!loadedImages[product.id] && (
-              <div className="absolute inset-0 bg-gray-200 animate-pulse rounded" />
-            )}
-            <img
-              src={product.image}
-              alt={product.title || product.name || "Product image"}
-              className="object-contain rounded w-auto h-full relative"
-              style={{ aspectRatio: "211 / 35" }}
-              onLoad={() =>
-                setLoadedImages((prev) => ({ ...prev, [product.id]: true }))
-              }
-            />
-          </div>
+          <Image
+            src={product.image}
+            alt={product.title || product.name || "Product image"}
+            width={700} // adjust as needed
+            height={400} // adjust as needed
+            className="object-contain rounded"
+            style={{ height }}
+          />
         </Link>
       ))}
 
